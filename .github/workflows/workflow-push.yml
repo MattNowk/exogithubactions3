@@ -2,6 +2,8 @@ name: Workflow lors d'un push
 on: push
 jobs:
   mon_job:
+    outputs:
+      statut-test: ${{ steps.run-test.outcome }}
     name: Build teste et run mon app
     runs-on: ubuntu-latest
     steps:
@@ -29,9 +31,10 @@ jobs:
           echo "On peut ajouter du markdown dans le fichier d'environnement GITHUB_STEP_SUMMARY. Il s'affichera sur la page de résumé d'une exécution de workflow." >> $GITHUB_STEP_SUMMARY
           echo "On pourrait par exemple y afficher les résultats de nos tests." >> $GITHUB_STEP_SUMMARY
 
-  # mon_2e_job:
-  #   name: Affiche si le test a réussi ou échoué
-  #   runs-on: ubuntu-latest
-  #   needs: mon_job
-  #   steps:
-  #     - name: Vérifier le statut des tests
+  mon_2e_job:
+    name: Affiche si le test a réussi ou échoué
+    runs-on: ubuntu-latest
+    needs: mon_job
+    steps:
+      - name: Vérifier le statut des tests
+        run: echo ${{ needs.mon_job.outputs.statut-test }}
