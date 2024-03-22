@@ -2,31 +2,47 @@ name: Workflow lors d'un push
 on: push
 jobs:
   mon_job:
-    name: Build teste et run mon application
+    name: Build teste et run mon app
     runs-on: ubuntu-latest
     steps:
-      - name: récupérer le code
+      - name: Récup le code
         uses: actions/checkout@v4
       - name: cache npm
         uses: actions/cache@v4
         with:
           path: ~/.npm
-          key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
-          # voir aussi : actions/setup-node
-      - name: installation des node_modules
+          key: devops-node-module-${{ hashFiles('**/package-lock.json') }}
+        # voir aussi : le cache de actions/setup-node
+        # - name: Setup Node.js
+        #   uses: actions/setup-node@v4
+        #   with:
+        #     cache: 'npm'
+      - name: Install node_modules
         run: npm ci
-      - name: test
+      - name: Test
         run: npm run test
-      - name: build
+      - name: Build
         run: npm run build
-      - name: start
+      - name: Start
         run: npm run start
-      - name: sommaire
+      - name: Sommaire
         run: |
           echo "# Résumé du step" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "On peut ajouter du markdown dans le fichier d'environnement GITHUB_STEP_SUMMARY. Il s'affichera sur la page de résumé d'une exécution de workflow." >> $GITHUB_STEP_SUMMARY
           echo "On pourrait par exemple y afficher les résultats de nos tests." >> $GITHUB_STEP_SUMMARY
-    
 
-  
+  mon_2e_job:
+    name: Affiche si le test a réussi ou échoué
+    runs-on: ubuntu-latest
+    needs: mon_job
+    steps:
+      - name: Vérifier le statut des tests
+        if: ${{ always() }}
+        run: |
+          status=$(cat $GITHUB_STEP_SUMMARY | grep "test a réussi" | wc -l)
+          if [ $status -gt 0 ]; then
+            echo "Les tests ont réussi !"
+          else
+            echo "Les tests ont échoué !"
+          fi
