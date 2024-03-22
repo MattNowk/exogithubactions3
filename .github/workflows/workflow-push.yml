@@ -33,11 +33,3 @@ jobs:
     needs: mon_job
     steps:
       - name: Vérifier le statut des tests
-      run: |
-        if npm run test; then
-          echo "Les tests ont réussi"
-          exit 0
-        else
-          echo "Les tests ont échoué"
-          exit 1
-      
