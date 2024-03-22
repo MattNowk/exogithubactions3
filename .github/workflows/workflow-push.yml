@@ -19,6 +19,7 @@ jobs:
       - name: Test
         id: run-test
         run: npm run test
+        continue-on-error: true
       - run: echo ${{ steps.run-test.outcome }}
       - name: Build
         run: npm run build
@@ -38,3 +39,4 @@ jobs:
     steps:
       - name: Vérifier le statut des tests
         run: echo ${{ needs.mon_job.outputs.statut-test }}
+      # Pblm si le test failed mon_job s'arrête donc 2emejob s'exec pas.
